@@ -10,7 +10,7 @@ export const register = payload =>(dispatch,getState) =>{
    getUser =  async ()=>{
       
         const user = await AsyncStorage.getItem(payload.email);
-        return user;
+        return JSON.parse(user);
     }
 
     saveUser = async (user) =>{
@@ -42,35 +42,40 @@ export const register = payload =>(dispatch,getState) =>{
         })
     })
    
+}
 
+export const login = payload =>(dispatch,getState) =>{
+   
+    //Check if user already exist
+   getUser =  async ()=>{
+      
+        const user = await AsyncStorage.getItem(payload.email);
+        return JSON.parse(user);
+    }
 
-//    return  fetch(serverURL+'user/login',{
-//        method:'post',
-//        headers: {
-//         'Accept': 'application/json', 
-//         'Content-Type': 'application/json',
-//       },
-//        body:JSON.stringify(payload)
-//    })
-//    .then(response => response.json()) 
-//    .then(response => { 
-    
-//     if(response.success){
-//         return response.token;
-//     }else{
-//         throw {message:'Error fetching assets'}
-//     }
+    getUser().then(u=>{
 
-//     })
-//     .then(token  => {
-//             dispatch({
-//                 type:types.REGISTRATION_SUCCESS,
-//                 token
-//             })
-//     }).catch(error =>{
-//             dispatch({
-//                 type:types.REGISTRATION_FAIL
-//             })
-//     });
+        if(u != null){
+           
+            if(payload.password === u.password){
+                dispatch({
+                    type:types.LOGIN_SUCCESS,
+                    token:u.email
+                    })
+            }else{
+                dispatch({
+                    type:types.LOGIN_FAIL,
+                    message:"Email or Password is not valid"
+                })
+            }
+        }else{
+            throw {message: 'User does not exist'}
+        }
+    }).catch(error=>{
+        dispatch({
+            type:types.LOGIN_FAIL,
+            message:error.message
+        })
+    })
 
 }

@@ -12,25 +12,22 @@ import {
   AsyncStorage
 } from 'react-native';
 import { connect } from 'react-redux'
-import { register } from '../actions'
-import {EMAIL,NAME,PASSWORD} from '../constants/Validation'
+import { login } from '../actions'
+import {EMAIL,PASSWORD} from '../constants/Validation'
 
 
-class RegistrationScreen extends React.Component {
+class LoginScreen extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = { 
-      nameFocus:false,
       emailFocus:false,
       passwordFocus:false,
-      nameError:false,
       emailError:false,
       passwordError:false,
       errorMessage:"",
       error:true,
-      name: "",
       email:"",
       password: "" };
   }
@@ -51,11 +48,6 @@ class RegistrationScreen extends React.Component {
     }
   }
 
-  updateName(name) {
-    this.setState({ name });
-   this.validate();
-  }
-
   updateEmail(email){
     this.setState({ email });
     this.validate();
@@ -66,10 +58,13 @@ class RegistrationScreen extends React.Component {
     this.validate();
   }
 
+  goToSignUp(){
+    this.props.navigation.navigate('Registration');
+  }
 
   render() {
     
-    const { name,email, password, nameError,emailError,passwordError, error , errorMessage } = this.state;
+    const { email, password, emailError,passwordError, error , errorMessage } = this.state;
     return (
 
       <View style={styles.container}>
@@ -78,18 +73,8 @@ class RegistrationScreen extends React.Component {
              <Text style={styles.logoText}>Unicorn</Text>
           </View>
 
-          <View style={styles.registrationFormContainer}>
+          <View style={styles.loginFormContainer}>
 
-             <View style={styles.textInputWrapper}>
-              <TextInput
-                style={styles.textInput}
-                value={name}
-                placeholder="Name"
-                onBlur={()=>{this.setState({nameFocus:true});this.validate();}}
-                onChangeText={(text) => this.updateName(text)}
-              />
-            </View>
-            {nameError ? <Text style={styles.errorMessage} >Name can only contain letters</Text> : null}
             <View style={styles.textInputWrapper}>
               <TextInput
                 style={styles.textInput}
@@ -115,20 +100,20 @@ class RegistrationScreen extends React.Component {
             </View>
             {passwordError ? <Text style={styles.errorMessage} >Password needs to be at least 6 character long</Text> : null}
 
-            <View style={styles.registrationButtonWrapper}>
-              <Button style={styles.registrationButton}
-                title="Register"
+            <View style={styles.loginButtonWrapper}>
+              <Button style={styles.LoginButton}
+                title="LogIn"
                 color="#ffff"
                 disabled={error}
-                onPress={() => this.onPressRegistrationButton()}
+                onPress={() => this.onPressLoginButton()}
               />
             </View>
             {errorMessage != "" ? <Text style={styles.errorMessage} >{errorMessage}</Text> : null}
 
             <View style={styles.companyLogoContainer}>
               <Text style={{marginBottom: 10}}>
-                Already have a account? 
-                <Text style = {styles.goToLoginButton} onPress={()=> this.goToLogIn()}> Login</Text>
+                Don't have a account? 
+                <Text style = {styles.goToSignUpButton} onPress={()=>this.goToSignUp()}> Sign up</Text>
               </Text>
             </View>
           </View>
@@ -137,11 +122,11 @@ class RegistrationScreen extends React.Component {
     );
   }
 
-  onPressRegistrationButton = async () => {
+  onPressLoginButton = async () => {
     if(this.validate()){
       
-      let user = { name: this.state.name, email:this.state.email, password: this.state.password };
-      this.props.dispatch(register(user));
+      let user = { email:this.state.email, password: this.state.password };
+      this.props.dispatch(login(user));
     }
     else{
       this.setState({ error: true });
@@ -149,20 +134,12 @@ class RegistrationScreen extends React.Component {
 
   }
 
-  goToLogIn(){
-    this.props.navigation.navigate('LogIn');
+  goToSignUp(){
+    this.props.navigation.navigate('Registration');
   }
 
   validate(){
     let valid = true;
-    
-    //Validate Name
-    if(NAME.test(this.state.name) === false){
-      valid = false;
-      this.state.nameFocus ? this.setState({nameError:true}) : null;
-    }else{
-      this.setState({nameError:false})
-    }
 
     //Validate Email
     if(EMAIL.test(this.state.email) === false){
@@ -210,7 +187,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
     color:'#fb1577'
   },
-  registrationFormContainer: {
+  loginFormContainer: {
     alignItems: 'center',
     marginHorizontal: 50,
   },
@@ -227,7 +204,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20
   },
-  registrationButtonWrapper: {
+  loginButtonWrapper: {
     width: 150,
     alignItems: 'center',
     marginTop: 20,
@@ -247,5 +224,5 @@ const mapStateToProps = (state) => {
 };
 
 
-export default connect(mapStateToProps)(RegistrationScreen)
+export default connect(mapStateToProps)(LoginScreen)
 
