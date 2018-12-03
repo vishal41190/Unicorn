@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { REGISTRATION_SUCCESS, REGISTRATION_FAIL,LOGIN_SUCCESS,LOGIN_FAIL } from '../constants/ActionTypes'
+import { REGISTRATION_SUCCESS, REGISTRATION_FAIL,LOGIN_SUCCESS,LOGIN_FAIL ,USER_UPDATED } from '../constants/ActionTypes'
 
 const INITIAL_STATE = {
     error: undefined
@@ -24,6 +24,10 @@ const userReducer = (state = INITIAL_STATE, action) => {
             return Object.assign({}, state, {
                 error: "Error Login",
                 errorMessage:action.message
+            });
+        case USER_UPDATED:
+            return Object.assign({}, state, {
+                user:action.user
             });
         default:
             return state;

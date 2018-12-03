@@ -1,13 +1,12 @@
 import * as types from '../constants/ActionTypes'
 import { AsyncStorage } from "react-native"
-const serverURL =  "http://256ec955.ngrok.io/1.0/api/"
 
 
 
 export const register = payload =>(dispatch,getState) =>{
    
     //Check if user already exist
-   getUser =  async ()=>{
+    getUserFromEmail =  async ()=>{
       
         const user = await AsyncStorage.getItem(payload.email);
         return JSON.parse(user);
@@ -17,7 +16,7 @@ export const register = payload =>(dispatch,getState) =>{
         await AsyncStorage.setItem(user.email, JSON.stringify(user));
         return user;
     }
-    getUser().then(u=>{
+    getUserFromEmail().then(u=>{
 
         if(u == null){
             
@@ -45,37 +44,65 @@ export const register = payload =>(dispatch,getState) =>{
 }
 
 export const login = payload =>(dispatch,getState) =>{
-   
     //Check if user already exist
-   getUser =  async ()=>{
-      
+   getUserFromEmail =  async ()=>{
         const user = await AsyncStorage.getItem(payload.email);
         return JSON.parse(user);
     }
 
-    getUser().then(u=>{
+    getUserFromEmail().then(u=>{
 
         if(u != null){
            
             if(payload.password === u.password){
+
                 dispatch({
                     type:types.LOGIN_SUCCESS,
                     token:u.email
                     })
             }else{
+
                 dispatch({
                     type:types.LOGIN_FAIL,
                     message:"Email or Password is not valid"
                 })
             }
-        }else{
+        }else
+        {
             throw {message: 'User does not exist'}
         }
     }).catch(error=>{
+
         dispatch({
             type:types.LOGIN_FAIL,
             message:error.message
         })
     })
 
+}
+
+
+export const getUser = payload =>(dispatch,getState) =>{
+   
+
+    //Check if user already exist
+   fetchUser =  async ()=>{
+        
+        const email = await AsyncStorage.getItem('userToken');
+        const user = await AsyncStorage.getItem(email);
+        return JSON.parse(user);
+    }
+
+    fetchUser().then(user=>{
+        dispatch({
+            type:types.USER_UPDATED,
+            user
+        })
+    }).catch(error=>{
+        dispatch({
+            type:types.REGISTRATION_FAIL,
+            message:error.message
+        })
+    })
+   
 }
